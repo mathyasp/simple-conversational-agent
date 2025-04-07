@@ -4,7 +4,7 @@ from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 import os
 from dotenv import load_dotenv
-load_dotenv()  # This needs to come first
+load_dotenv()
 os.environ["OPENAI_API_KEY"] = os.getenv('OPENAI_API_KEY')
 
 llm = ChatOpenAI(model="gpt-4o-mini", max_tokens=1000, temperature=0)
@@ -46,6 +46,13 @@ response2 = chain_with_history.invoke(
 )
 print("AI:", response2.content)
 
-print("\nConversation History:")
-for message in store[session_id].messages:
-    print(f"{message.type}: {message.content}")
+def print_conversation_history(session_id):
+    if session_id in store:
+        print("\nConversation History:")
+        for message in store[session_id].messages:
+            sender = "User" if message.type == "human" else "AI"
+            print(f"{sender}: {message.content}")
+    else:
+        print("No conversation history found")
+
+print_conversation_history(session_id)
