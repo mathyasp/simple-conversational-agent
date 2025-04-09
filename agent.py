@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 os.environ["OPENAI_API_KEY"] = os.getenv('OPENAI_API_KEY')
 
-llm = ChatOpenAI(model="gpt-4o-mini", max_tokens=1000, temperature=0)
+llm = ChatOpenAI(model="gpt-3.5-turbo", max_tokens=1000, temperature=0)
 
 store = {}
 
@@ -33,19 +33,6 @@ chain_with_history = RunnableWithMessageHistory(
 
 session_id = "user_123"
 
-
-response1 = chain_with_history.invoke(
-    {"input": "Hello! How are you?"},
-    config={"configurable": {"session_id": session_id}}
-)
-print("AI:", response1.content)
-
-response2 = chain_with_history.invoke(
-    {"input": "What was my previous message?"},
-    config={"configurable": {"session_id": session_id}}
-)
-print("AI:", response2.content)
-
 def print_conversation_history(session_id):
     if session_id in store:
         print("\nConversation History:")
@@ -55,4 +42,22 @@ def print_conversation_history(session_id):
     else:
         print("No conversation history found")
 
-print_conversation_history(session_id)
+def chat():
+    print("Chat started. Type 'quit' to exit or 'history' to see conversation history.")
+    while True:
+        user_input = input("\nYou: ").strip()
+        
+        if user_input.lower() == 'quit':
+            break
+        elif user_input.lower() == 'history':
+            print_conversation_history(session_id)
+            continue
+        
+        response = chain_with_history.invoke(
+            {"input": user_input},
+            config={"configurable": {"session_id": session_id}}
+        )
+        print("AI:", response.content)
+
+if __name__ == "__main__":
+    chat()
